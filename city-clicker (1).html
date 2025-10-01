@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Clicker - Build Your Futuristic Space City</title>
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        :root {
+            --primary-color: #0066ff;
+            --primary-glow: #00a2ff;
+            --secondary-color: #00ffcc;
+            --dark-bg: #050a1f;
+            --card-bg: rgba(10, 20, 50, 0.7);
+            --text-color: #e0f0ff;
+            --danger-color: #ff3366;
+            --success-color: #00cc88;
+            --warning-color: #ffcc00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ========== ANIMATED STARS BACKGROUND ========== */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: var(--brightness); }
+        }
+
+        /* ========== CONTAINER STYLES ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== GLASS CARD STYLES ========== */
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 102, 255, 0.2);
+        }
+
+        /* ========== BUTTON STYLES ========== */
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-glow));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+        }
+
+        .btn:hover::after {
+            animation: btn-shine 1.5s infinite;
+        }
+
+        @keyframes btn-shine {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3366, #ff0044);
+            box-shadow: 0 4px 12px rgba(255, 51, 102, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00cc88, #00aa66);
+            box-shadow: 0 4px 12px rgba(0, 204, 136, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+            color: #333;
+        }
+
+        .btn-disabled {
+            background: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ========== INPUT STYLES ========== */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.3);
+        }
+
+        /* ========== HEADER STYLES ========== */
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .game-subtitle {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        /* ========== GAME SCREENS ========== */
+        .game-screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== WELCOME SCREEN ========== */
+        #welcome-screen {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+
+        #welcome-screen .glass-card {
+            padding: 40px;
+        }
+
+        /* ========== MAIN GAME SCREEN ========== */
+        #game-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== STATS PANEL ========== */
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* ========== CITY DISPLAY ========== */
+        .city-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        #city-canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .click-effect {
+            position: absolute;
+            pointer-events: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 162, 255, 0.8) 0%, rgba(0, 102, 255, 0) 70%);
+            transform: translate(-50%, -50%);
+            animation: clickEffect 0.5s forwards;
+        }
+
+        @keyframes clickEffect {
+            0% { opacity: 1; width: 0; height: 0; }
+            100% { opacity: 0; width: 100px; height: 100px; }
+        }
+
+        /* ========== UPGRADES PANEL ========== */
+        .upgrades-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .upgrade-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .upgrade-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .upgrade-item.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-left-color: #666;
+        }
+
+        .upgrade-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        .upgrade-desc {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .upgrade-cost {
+            font-weight: 600;
+            color: var(--warning-color);
+        }
+
+        .upgrade-level {
+            font-size: 12px;
+            background: rgba(0, 102, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        /* ========== ACTIVITY LOG ========== */
+        .activity-log {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .log-message {
+            opacity: 0.9;
+        }
+
+        /* ========== BAN SCREEN ========== */
+        #ban-screen {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 200px);
+        }
+
+        #ban-screen .glass-card {
+            padding: 40px;
+            border: 2px solid var(--danger-color);
+            width: 100%;
+        }
+
+        .ban-title {
+            color: var(--danger-color);
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .ban-message {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .ban-timer {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--warning-color);
+        }
+
+        .ban-strikes {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .strike-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #333;
+            margin: 0 5px;
+        }
+
+        .strike-indicator.active {
+            background-color: var(--danger-color);
+        }
+
+        /* ========== APPEAL SYSTEM ========== */
+        .appeal-form {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .appeal-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: none;
+        }
+
+        .appeal-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .appeal-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .appeal-rejected {
+            background: rgba(255, 51, 102, 0.2);
+            color: var(--danger-color);
+        }
+
+        .appeal-accepted {
+            background: rgba(0, 204, 136, 0.2);
+            color: var(--success-color);
+        }
+
+        /* ========== FOOTER ========== */
+        .game-footer {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        /* ========== UTILITY CLASSES ========== */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ========== MODAL STYLES ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ========== SAVE/LOAD STYLES ========== */
+        .save-code {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: monospace;
+            margin-bottom: 15px;
+            resize: none;
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars-container" id="stars-container"></div>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1 class="game-title">City Clicker</h1>
+            <p class="game-subtitle">Build your futuristic space city one click at a time</p>
+        </header>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="game-screen active">
+            <div class="glass-card">
+                <h2 class="mb-20">Welcome to City Clicker</h2>
+                <p class="mb-20">Create your own futuristic space city and watch it grow with each click!</p>
+                
+                <div class="input-group">
+                    <label for="city-name-input" class="input-label">Name Your City</label>
+                    <input type="text" id="city-name-input" class="input-field" placeholder="Enter city name..." maxlength="20">
+                </div>
+                
+                <button id="start-game-btn" class="btn">Start Building</button>
+            </div>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="game-screen" class="game-screen">
+            <div class="game-grid">
+                <!-- Stats Panel -->
+                <div class="stats-panel glass-card">
+                    <h3>City Statistics</h3>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">City Name</span>
+                        <span class="stat-value" id="city-name-display">-</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">City Points</span>
+                        <span class="stat-value" id="points-display">0</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">Click Power</span>
+                        <span class="stat-value" id="click-power-display">1</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">Points Per Second</span>
+                        <span class="stat-value" id="cps-display">0</span>
+                    </div>
+                    
+                    <div class="flex-between mt-20">
+                        <button id="save-btn" class="btn">Save/Export</button>
+                        <button id="reset-btn" class="btn btn-danger">Reset</button>
+                    </div>
+                </div>
+                
+                <!-- City Display -->
+                <div class="city-display glass-card">
+                    <h3 class="mb-20">Your City</h3>
+                    <div class="canvas-container">
+                        <canvas id="city-canvas" width="500" height="400"></canvas>
+                    </div>
+                    <p class="mt-20">Click on your city to earn points!</p>
+                </div>
+                
+                <!-- Upgrades Panel -->
+                <div class="upgrades-panel glass-card">
+                    <h3>City Upgrades</h3>
+                    <div id="upgrades-container">
+                        <!-- Upgrades will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Log -->
+            <div class="glass-card">
+                <h3>Activity Log</h3>
+                <div class="activity-log" id="activity-log">
+                    <!-- Log entries will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Ban Screen -->
+        <div id="ban-screen" class="game-screen">
+            <div class="glass-card">
+                <h2 class="ban-title">ACCOUNT BANNED</h2>
+                <p class="ban-message" id="ban-reason">You have been banned for violating our terms.</p>
+                
+                <div class="ban-strikes">
+                    <span>Strike Count:</span>
+                    <span class="strike-indicator" id="strike-1"></span>
+                    <span class="strike-indicator" id="strike-2"></span>
+                    <span class="strike-indicator" id="strike-3"></span>
+                </div>
+                
+                <div class="ban-timer" id="ban-timer">
+                    <!-- Ban timer will be displayed here -->
+                </div>
+                
+                <div class="appeal-form" id="appeal-form">
+                    <h3>Appeal Your Ban</h3>
+                    <p>Explain why your ban should be lifted:</p>
+                    <textarea id="appeal-text" class="appeal-textarea" placeholder="Type your appeal here..."></textarea>
+                    <button id="submit-appeal-btn" class="btn">Submit Appeal</button>
+                    
+                    <div id="appeal-result" class="appeal-result" style="display: none;">
+                        <!-- Appeal result will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>City Clicker &copy; 2025 | A Futuristic Idle Game</p>
+        </footer>
+    </div>
+
+    <!-- Save/Load Modal -->
+    <div class="modal-overlay" id="save-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Save/Load Game</h3>
+                <button class="modal-close" id="close-save-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>Export Save</h4>
+                <p>Copy this code to save your game:</p>
+                <textarea id="export-code" class="save-code" readonly></textarea>
+                
+                <h4>Import Save</h4>
+                <p>Paste your save code here:</p>
+                <textarea id="import-code" class="save-code" placeholder="Paste save code here..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="copy-save-btn" class="btn">Copy Save</button>
+                <button id="import-save-btn" class="btn">Import Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Script -->
+    <script>
+        /**
+         * City Clicker - A futuristic city building clicker game
+         * 
+         * Features:
+         * - Futuristic blue space city theme with animated stars background
+         * - City name input screen at the start
+         * - Core gameplay with clicking, upgrades, and CPS
+         * - Moderation system with ban functionality
+         * - Save/load system using localStorage
+         * - Export/Import save as JSON
+         * - Activity log
+         * - Appeal system for bans
+         */
+
+        // ========== GAME INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the game
+            initGame();
+        });
+
+        /**
+         * Initialize the game and set up event listeners
+         */
+        function initGame() {
+            // Create stars background
+            createStarsBackground();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize the city canvas
+            initCityCanvas();
+            
+            // Load game data from localStorage
+            loadGameData();
+            
+            // Check if player is banned
+            checkBanStatus();
+            
+            // Start the game loop
+            startGameLoop();
+            
+            // Log game initialization
+            logActivity('Game initialized');
+        }
+
+        // ========== GAME STATE ==========
+        // Game state object to store all game data
+        const gameState = {
+            cityName: '',
+            points: 0,
+            clickPower: 1,
+            cps: 0,
+            upgrades: {},
+            banInfo: {
+                isBanned: false,
+                isPermanent: false,
+                reason: '',
+                endTime: 0,
+                strikes: 0,
+                appealRejected: false
+            },
+            lastClickTimes: [],
+            activityLog: []
+        };
+
+        // Upgrade definitions
+        const upgradeDefinitions = [
+            {
+                id: 'click-power',
+                name: 'Click Enhancer',
+                description: 'Increase points per click',
+                baseCost: 10,
+                costMultiplier: 1.5,
+                effect: level => level + 1,
+                effectType: 'clickPower'
+            },
+            {
+                id: 'auto-clicker',
+                name: 'Auto Builder',
+                description: 'Generate points automatically',
+                baseCost: 25,
+                costMultiplier: 1.7,
+                effect: level => level,
+                effectType: 'cps'
+            },
+            {
+                id: 'sky-scraper',
+                name: 'Taller Buildings',
+                description: 'Double your click power',
+                baseCost: 100,
+                costMultiplier: 2.2,
+                effect: level => gameState.clickPower * (level > 0 ? 2 : 1),
+                effectType: 'clickPower'
+            },
+            {
+                id: 'space-elevator',
+                name: 'Space Elevator',
+                description: 'Triple your CPS',
+                baseCost: 250,
+                costMultiplier: 3,
+                effect: level => gameState.cps * (level > 0 ? 3 : 1),
+                effectType: 'cps'
+            },
+            {
+                id: 'quantum-builder',
+                name: 'Quantum Builder',
+                description: 'Massively increase click power and CPS',
+                baseCost: 1000,
+                costMultiplier: 5,
+                effect: level => level > 0 ? 10 : 1,
+                effectType: 'both'
+            }
+        ];
+
+        // Forbidden words for moderation
+        const forbiddenWords = [
+            'pussy', 'penis', 'cum', 'fuck', 'shit', 'bitch', 'dick', 'cunt', 'asshole'
+        ];
+
+        // ========== EVENT LISTENERS ==========
+        /**
+         * Set up all event listeners for the game
+         */
+        function setupEventListeners() {
+            // Start game button
+            document.getElementById('start-game-btn').addEventListener('click', startGame);
+            
+            // City canvas click
+            document.getElementById('city-canvas').addEventListener('click', handleCityClick);
+            
+            // Save/Export button
+            document.getElementById('save-btn').addEventListener('click', openSaveModal);
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', confirmReset);
+            
+            // Close save modal
+            document.getElementById('close-save-modal').addEventListener('click', closeSaveModal);
+            
+            // Copy save code
+            document.getElementById('copy-save-btn').addEventListener('click', copySaveCode);
+            
+            // Import save
+            document.getElementById('import-save-btn').addEventListener('click', importSave);
+            
+            // Submit appeal
+            document.getElementById('submit-appeal-btn').addEventListener('click', submitAppeal);
+        }
+
+        // ========== STARS BACKGROUND ==========
+        /**
+         * Create the animated stars background
+         */
+        function createStarsBackground() {
+            const container = document.getElementById('stars-container');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random position
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 3;
+                
+                // Random animation properties
+                const duration = 2 + Math.random() * 4;
+                const delay = Math.random() * 5;
+                const brightness = 0.5 + Math.random() * 0.5;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--delay', `${delay}s`);
+                star.style.setProperty('--brightness', brightness);
+                
+                container.appendChild(star);
+            }
+        }
+
+        // ========== CITY CANVAS ==========
+        // Canvas context
+        let ctx;
+        
+        /**
+         * Initialize the city canvas and draw the initial city
+         */
+        function initCityCanvas() {
+            const canvas = document.getElementById('city-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Draw the initial city
+            drawCity();
+        }
+        
+        /**
+         * Draw the city on the canvas
+         */
+        function drawCity() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            
+            // Set up gradient background
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+            bgGradient.addColorStop(0, '#050a1f');
+            bgGradient.addColorStop(1, '#0a1a3f');
+            
+            // Draw background
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            
+            // Draw stars
+            drawStars();
+            
+            // Draw buildings based on game progress
+            drawBuildings();
+            
+            // Draw glow effects
+            drawGlowEffects();
+        }
+        
+        /**
+         * Draw stars in the city background
+         */
+        function drawStars() {
+            const starCount = 100;
+            
+            ctx.fillStyle = 'white';
+            for (let i = 0; i < starCount; i++) {
+                const x = Math.random() * ctx.canvas.width;
+                const y = Math.random() * (ctx.canvas.height / 2);
+                const size = Math.random() * 2;
+                
+                ctx.globalAlpha = 0.5 + Math.random() * 0.5;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+        
+        /**
+         * Draw buildings based on game progress
+         */
+        function drawBuildings() {
+            // Calculate building count based on points
+            const buildingCount = Math.min(20, 5 + Math.floor(Math.log(gameState.points + 1) / Math.log(5)));
+            
+            // Building properties
+            const buildingWidth = 20;
+            const spacing = 5;
+            const totalWidth = buildingCount * (buildingWidth + spacing);
+            const startX = (ctx.canvas.width - totalWidth) / 2;
+            
+            // Draw each building
+            for (let i = 0; i < buildingCount; i++) {
+                // Calculate building height based on position and game progress
+                const baseHeight = 100 + (i % 3) * 30;
+                const progressBonus = Math.min(200, Math.log(gameState.points + 1) * 20);
+                const height = baseHeight + progressBonus * (0.5 + Math.sin(i * 0.5) * 0.5);
+                
+                // Calculate building position
+                const x = startX + i * (buildingWidth + spacing);
+                const y = ctx.canvas.height - height;
+                
+                // Building gradient
+                const buildingGradient = ctx.createLinearGradient(x, y, x + buildingWidth, y);
+                buildingGradient.addColorStop(0, '#0066ff');
+                buildingGradient.addColorStop(1, '#00a2ff');
+                
+                // Draw building
+                ctx.fillStyle = buildingGradient;
+                ctx.fillRect(x, y, buildingWidth, height);
+                
+                // Draw windows
+                drawBuildingWindows(x, y, buildingWidth, height);
+                
+                // Draw antenna for tall buildings
+                if (height > 250) {
+                    drawBuildingAntenna(x, y, buildingWidth);
+                }
+            }
+            
+            // Draw ground
+            const groundGradient = ctx.createLinearGradient(0, ctx.canvas.height - 20, 0, ctx.canvas.height);
+            groundGradient.addColorStop(0, '#0a2a5f');
+            groundGradient.addColorStop(1, '#051a3f');
+            
+            ctx.fillStyle = groundGradient;
+            ctx.fillRect(0, ctx.canvas.height - 20, ctx.canvas.width, 20);
+        }
+        
+        /**
+         * Draw windows on a building
+         */
+        function drawBuildingWindows(x, y, width, height) {
+            const windowSize = 3;
+            const windowSpacing = 6;
+            const windowsPerRow = Math.floor(width / windowSpacing);
+            const windowsPerColumn = Math.floor(height / windowSpacing);
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            
+            for (let row = 0; row < windowsPerColumn; row++) {
+                for (let col = 0; col < windowsPerRow; col++) {
+                    // Random chance to draw a window
+                    if (Math.random() > 0.3) {
+                        const windowX = x + col * windowSpacing + (windowSpacing - windowSize) / 2;
+                        const windowY = y + row * windowSpacing + (windowSpacing - windowSize) / 2;
+                        
+                        ctx.fillRect(windowX, windowY, windowSize, windowSize);
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Draw antenna on top of a building
+         */
+        function drawBuildingAntenna(x, y, width) {
+            const antennaWidth = 2;
+            const antennaHeight = 20;
+            const antennaX = x + width / 2 - antennaWidth / 2;
+            
+            ctx.fillStyle = '#00ffcc';
+            ctx.fillRect(antennaX, y - antennaHeight, antennaWidth, antennaHeight);
+            
+            // Draw blinking light
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+                ctx.beginPath();
+                ctx.arc(antennaX + antennaWidth / 2, y - antennaHeight, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        /**
+         * Draw glow effects on the city
+         */
+        function drawGlowEffects() {
+            // Draw city glow
+            const glowGradient = ctx.createRadialGradient(
+                ctx.canvas.width / 2, ctx.canvas.height, 0,
+                ctx.canvas.width / 2, ctx.canvas.height, ctx.canvas.height / 2
+            );
+            
+            glowGradient.addColorStop(0, 'rgba(0, 102, 255, 0.3)');
+            glowGradient.addColorStop(1, 'rgba(0, 102, 255, 0)');
+            
+            ctx.fillStyle = glowGradient;
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        }
+
+        // ========== GAME MECHANICS ==========
+        /**
+         * Start the game when player submits city name
+         */
+        function startGame() {
+            const cityNameInput = document.getElementById('city-name-input');
+            const cityName = cityNameInput.value.trim();
+            
+            // Validate city name
+            if (!cityName) {
+                alert('Please enter a city name');
+                return;
+            }
+            
+            // Check for forbidden words
+            if (containsForbiddenWords(cityName)) {
+                banPlayer('Using forbidden words in city name', false);
+                return;
+            }
+            
+            // Check if player is trying to rename city
+            if (gameState.cityName && gameState.cityName !== cityName) {
+                banPlayer('Attempting to rename city', false);
+                return;
+            }
+            
+            // Set city name
+            gameState.cityName = cityName;
+            
+            // Initialize upgrades if new game
+            if (Object.keys(gameState.upgrades).length === 0) {
+                initializeUpgrades();
+            }
+            
+            // Switch to game screen
+            showScreen('game-screen');
+            
+            // Update UI
+            updateUI();
+            
+            // Log activity
+            logActivity(`City "${cityName}" established`);
+            
+            // Save game data
+            saveGameData();
+        }
+        
+        /**
+         * Initialize upgrades for a new game
+         */
+        function initializeUpgrades() {
+            upgradeDefinitions.forEach(upgrade => {
+                gameState.upgrades[upgrade.id] = {
+                    level: 0,
+                    cost: upgrade.baseCost
+                };
+            });
+        }
+        
+        /**
+         * Handle city click event
+         * @param {Event} e - Click event
+         */
+        function handleCityClick(e) {
+            // Check if player is banned
+            if (gameState.banInfo.isBanned) {
+                return;
+            }
+            
+            // Record click time for autoclicker detection
+            const clickTime = Date.now();
+            gameState.lastClickTimes.push(clickTime);
+            
+            // Keep only the last 10 click times
+            if (gameState.lastClickTimes.length > 10) {
+                gameState.lastClickTimes.shift();
+            }
+            
+            // Check for autoclicker
+            if (detectAutoclicker()) {
+                banPlayer('Autoclicker detected', false);
+                return;
+            }
+            
+            // Add points based on click power
+            gameState.points += gameState.clickPower;
+            
+            // Create click effect
+            createClickEffect(e);
+            
+            // Update UI
+            updateUI();
+            
+            // Save game data
+            saveGameData();
+        }
+        
+        /**
+         * Create visual click effect
+         * @param {Event} e - Click event
+         */
+        function createClickEffect(e) {
+            const canvas = document.getElementById('city-canvas');
+            const rect = canvas.getBoundingClientRect();
+            
+            // Calculate click position relative to canvas
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Create effect element
+            const effect = document.createElement('div');
+            effect.classList.add('click-effect');
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            
+            // Add to canvas container
+            document.querySelector('.canvas-container').appendChild(effect);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                effect.remove();
+            }, 500);
+        }
+        
+        /**
+         * Purchase an upgrade
+         * @param {string} upgradeId - ID of the upgrade to purchase
+         */
+        function purchaseUpgrade(upgradeId) {
+            // Check if player is banned
+            if (gameState.banInfo.isBanned) {
+                return;
+            }
+            
+            // Get upgrade data
+            const upgrade = gameState.upgrades[upgradeId];
+            const upgradeDef = upgradeDefinitions.find(u => u.id === upgradeId);
+            
+            // Check if player has enough points
+            if (gameState.points < upgrade.cost) {
+                return;
+            }
+            
+            // Deduct points
+            gameState.points -= upgrade.cost;
+            
+            // Increase upgrade level
+            upgrade.level++;
+            
+            // Calculate new cost
+            upgrade.cost = Math.floor(upgradeDef.baseCost * Math.pow(upgradeDef.costMultiplier, upgrade.level));
+            
+            // Apply upgrade effect
+            applyUpgradeEffects();
+            
+            // Log activity
+            logActivity(`Purchased ${upgradeDef.name} (Level ${upgrade.level})`);
+            
+            // Update UI
+            updateUI();
+            
+            // Save game data
+            saveGameData();
+        }
+        
+        /**
+         * Apply effects of all purchased upgrades
+         */
+        function applyUpgradeEffects() {
+            // Reset base values
+            gameState.clickPower = 1;
+            gameState.cps = 0;
+            
+            // Apply each upgrade effect
+            upgradeDefinitions.forEach(upgradeDef => {
+                const upgrade = gameState.upgrades[upgradeDef.id];
+                
+                if (upgrade && upgrade.level > 0) {
+                    const effect = upgradeDef.effect(upgrade.level);
+                    
+                    if (upgradeDef.effectType === 'clickPower') {
+                        gameState.clickPower = effect;
+                    } else if (upgradeDef.effectType === 'cps') {
+                        gameState.cps += effect;
+                    } else if (upgradeDef.effectType === 'both') {
+                        gameState.clickPower *= effect;
+                        gameState.cps *= effect;
+                    }
+                }
+            });
+        }
+        
+        /**
+         * Start the game loop for automatic point generation
+         */
+        function startGameLoop() {
+            // Update points from CPS every second
+            setInterval(() => {
+                if (!gameState.banInfo.isBanned && gameState.cps > 0) {
+                    gameState.points += gameState.cps;
+                    updateUI();
+                    saveGameData();
+                }
+            }, 1000);
+            
+            // Update ban timer every second
+            setInterval(updateBanTimer, 1000);
+            
+            // Redraw city every 5 seconds to update based on progress
+            setInterval(drawCity, 5000);
+        }
+
+        // ========== UI UPDATES ==========
+        /**
+         * Update all UI elements based on current game state
+         */
+        function updateUI() {
+            // Update city name
+            document.getElementById('city-name-display').textContent = gameState.cityName;
+            
+            // Update points
+            document.getElementById('points-display').textContent = formatNumber(gameState.points);
+            
+            // Update click power
+            document.getElementById('click-power-display').textContent = formatNumber(gameState.clickPower);
+            
+            // Update CPS
+            document.getElementById('cps-display').textContent = formatNumber(gameState.cps);
+            
+            // Update upgrades
+            updateUpgradesUI();
+            
+            // Redraw city
+            drawCity();
+        }
+        
+        /**
+         * Update the upgrades UI
+         */
+        function updateUpgradesUI() {
+            const upgradesContainer = document.getElementById('upgrades-container');
+            upgradesContainer.innerHTML = '';
+            
+            // Create upgrade elements
+            upgradeDefinitions.forEach(upgradeDef => {
+                const upgrade = gameState.upgrades[upgradeDef.id];
+                
+                // Create upgrade element
+                const upgradeElement = document.createElement('div');
+                upgradeElement.classList.add('upgrade-item');
+                
+                // Check if player can afford this upgrade
+                const canAfford = gameState.points >= upgrade.cost;
+                if (!canAfford) {
+                    upgradeElement.classList.add('disabled');
+                }
+                
+                // Set upgrade content
+                upgradeElement.innerHTML = `
+                    <div class="upgrade-name">
+                        ${upgradeDef.name}
+                        <span class="upgrade-level">Level ${upgrade.level}</span>
+                    </div>
+                    <div class="upgrade-desc">${upgradeDef.description}</div>
+                    <div class="upgrade-cost">Cost: ${formatNumber(upgrade.cost)} points</div>
+                `;
+                
+                // Add click event
+                if (canAfford) {
+                    upgradeElement.addEventListener('click', () => purchaseUpgrade(upgradeDef.id));
+                }
+                
+                // Add to container
+                upgradesContainer.appendChild(upgradeElement);
+            });
+        }
+        
+        /**
+         * Show a specific game screen and hide others
+         * @param {string} screenId - ID of the screen to show
+         */
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show the specified screen
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        /**
+         * Format a number for display (e.g., 1,000,000 -> 1M)
+         * @param {number} num - Number to format
+         * @returns {string} Formatted number
+         */
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            } else {
+                return num.toString();
+            }
+        }
+
+        // ========== MODERATION SYSTEM ==========
+        /**
+         * Check if a string contains any forbidden words
+         * @param {string} text - Text to check
+         * @returns {boolean} True if text contains forbidden words
+         */
+        function containsForbiddenWords(text) {
+            if (!text) return false;
+            
+            const lowerText = text.toLowerCase();
+            return forbiddenWords.some(word => lowerText.includes(word));
+        }
+        
+        /**
+         * Detect if player is using an autoclicker
+         * @returns {boolean} True if autoclicker detected
+         */
+        function detectAutoclicker() {
+            // Need at least 5 clicks to detect pattern
+            if (gameState.lastClickTimes.length < 5) {
+                return false;
+            }
+            
+            // Check intervals between clicks
+            for (let i = 1; i < gameState.lastClickTimes.length; i++) {
+                const interval = gameState.lastClickTimes[i] - gameState.lastClickTimes[i - 1];
+                
+                // If interval is consistently less than 50ms, likely an autoclicker
+                if (interval < 50) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        /**
+         * Ban a player
+         * @param {string} reason - Reason for the ban
+         * @param {boolean} isPermanent - Whether the ban is permanent
+         */
+        function banPlayer(reason, isPermanent = false) {
+            // Increment strike count
+            gameState.banInfo.strikes++;
+            
+            // Check if this is the third strike (permanent ban)
+            if (gameState.banInfo.strikes >= 3) {
+                isPermanent = true;
+            }
+            
+            // Set ban info
+            gameState.banInfo.isBanned = true;
+            gameState.banInfo.isPermanent = isPermanent;
+            gameState.banInfo.reason = reason;
+            
+            // Set ban end time (1 minute from now) if not permanent
+            if (!isPermanent) {
+                gameState.banInfo.endTime = Date.now() + 60000; // 1 minute
+            } else {
+                gameState.banInfo.endTime = 0; // No end time for permanent ban
+            }
+            
+            // Reset appeal status
+            gameState.banInfo.appealRejected = false;
+            
+            // Log activity
+            logActivity(`BANNED: ${reason} (Strike ${gameState.banInfo.strikes}/3)`);
+            
+            // Save game data
+            saveGameData();
+            
+            // Update ban screen
+            updateBanScreen();
+            
+            // Show ban screen
+            showScreen('ban-screen');
+        }
+        
+        /**
+         * Update the ban screen with current ban information
+         */
+        function updateBanScreen() {
+            // Update ban reason
+            document.getElementById('ban-reason').textContent = gameState.banInfo.reason;
+            
+            // Update strike indicators
+            for (let i = 1; i <= 3; i++) {
+                const strikeElement = document.getElementById(`strike-${i}`);
+                if (i <= gameState.banInfo.strikes) {
+                    strikeElement.classList.add('active');
+                } else {
+                    strikeElement.classList.remove('active');
+                }
+            }
+            
+            // Update ban timer
+            updateBanTimer();
+            
+            // Show/hide appeal form based on permanent ban status
+            const appealForm = document.getElementById('appeal-form');
+            appealForm.style.display = gameState.banInfo.isPermanent ? 'block' : 'none';
+            
+            // Hide appeal result
+            document.getElementById('appeal-result').style.display = 'none';
+        }
+        
+        /**
+         * Update the ban timer display
+         */
+        function updateBanTimer() {
+            const banTimerElement = document.getElementById('ban-timer');
+            
+            // Check if player is banned
+            if (!gameState.banInfo.isBanned) {
+                return;
+            }
+            
+            // Check if ban has expired
+            if (!gameState.banInfo.isPermanent && gameState.banInfo.endTime <= Date.now()) {
+                // Unban player
+                gameState.banInfo.isBanned = false;
+                
+                // Save game data
+                saveGameData();
+                
+                // Return to game screen
+                showScreen('game-screen');
+                
+                // Log activity
+                logActivity('Ban expired, access restored');
+                
+                return;
+            }
+            
+            // Update timer display
+            if (gameState.banInfo.isPermanent) {
+                banTimerElement.textContent = 'PERMANENT BAN';
+            } else {
+                const remainingTime = Math.max(0, gameState.banInfo.endTime - Date.now());
+                const seconds = Math.ceil(remainingTime / 1000);
+                banTimerElement.textContent = `Ban expires in: ${seconds} seconds`;
+            }
+        }
+        
+        /**
+         * Submit an appeal for a permanent ban
+         */
+        function submitAppeal() {
+            // Get appeal text
+            const appealText = document.getElementById('appeal-text').value.trim();
+            
+            // Check if appeal is empty
+            if (!appealText) {
+                alert('Please enter your appeal reason');
+                return;
+            }
+            
+            // Check if appeal was already rejected
+            if (gameState.banInfo.appealRejected) {
+                showAppealResult(false, 'You have already submitted an appeal. No further appeals allowed.');
+                return;
+            }
+            
+            // Process appeal with AI
+            const appealAccepted = processAppeal(appealText);
+            
+            // Show result
+            showAppealResult(appealAccepted, appealAccepted ? 
+                'Appeal accepted. Your ban has been lifted.' : 
+                'Appeal rejected. Your ban remains in effect.');
+            
+            // If appeal accepted, unban player
+            if (appealAccepted) {
+                // Unban but keep strikes
+                gameState.banInfo.isBanned = false;
+                gameState.banInfo.isPermanent = false;
+                
+                // Save game data
+                saveGameData();
+                
+                // Log activity
+                logActivity('Ban appeal accepted, access restored');
+                
+                // Return to game screen after 3 seconds
+                setTimeout(() => {
+                    showScreen('game-screen');
+                }, 3000);
+            } else {
+                // Mark appeal as rejected
+                gameState.banInfo.appealRejected = true;
+                
+                // Save game data
+                saveGameData();
+                
+                // Log activity
+                logActivity('Ban appeal rejected');
+            }
+        }
+        
+        /**
+         * Process an appeal with simple AI
+         * @param {string} appealText - The appeal text
+         * @returns {boolean} Whether the appeal is accepted
+         */
+        function processAppeal(appealText) {
+            // Convert to lowercase for easier checking
+            const lowerAppeal = appealText.toLowerCase();
+            
+            // Check for forbidden words in appeal
+            if (containsForbiddenWords(lowerAppeal)) {
+                return false;
+            }
+            
+            // Check if appeal is too short
+            if (appealText.length < 20) {
+                return false;
+            }
+            
+            // Check for sincere apology keywords
+            const apologeticWords = ['sorry', 'apologize', 'apology', 'mistake', 'won\'t happen again', 'regret'];
+            const hasApology = apologeticWords.some(word => lowerAppeal.includes(word));
+            
+            // Check for understanding of rules
+            const understandingWords = ['understand', 'rules', 'policy', 'guidelines', 'terms'];
+            const showsUnderstanding = understandingWords.some(word => lowerAppeal.includes(word));
+            
+            // Check for promise to improve
+            const promiseWords = ['promise', 'future', 'better', 'improve', 'change', 'learn'];
+            const hasPromise = promiseWords.some(word => lowerAppeal.includes(word));
+            
+            // Calculate acceptance score
+            let score = 0;
+            if (hasApology) score += 1;
+            if (showsUnderstanding) score += 1;
+            if (hasPromise) score += 1;
+            if (appealText.length > 50) score += 1;
+            
+            // Accept if score is high enough (3 or more points)
+            return score >= 3;
+        }
+        
+        /**
+         * Show the appeal result
+         * @param {boolean} accepted - Whether the appeal was accepted
+         * @param {string} message - Result message
+         */
+        function showAppealResult(accepted, message) {
+            const resultElement = document.getElementById('appeal-result');
+            resultElement.textContent = message;
+            resultElement.className = 'appeal-result ' + (accepted ? 'appeal-accepted' : 'appeal-rejected');
+            resultElement.style.display = 'block';
+        }
+        
+        /**
+         * Check if player is banned when loading the game
+         */
+        function checkBanStatus() {
+            if (gameState.banInfo.isBanned) {
+                // Check if temporary ban has expired
+                if (!gameState.banInfo.isPermanent && gameState.banInfo.endTime <= Date.now()) {
+                    // Unban player
+                    gameState.banInfo.isBanned = false;
+                    saveGameData();
+                    logActivity('Ban expired while offline, access restored');
+                } else {
+                    // Show ban screen
+                    updateBanScreen();
+                    showScreen('ban-screen');
+                }
+            } else if (gameState.cityName) {
+                // If player has a city name and is not banned, show game screen
+                showScreen('game-screen');
+            }
+            // Otherwise, show welcome screen (default)
+        }
+
+        // ========== ACTIVITY LOG ==========
+        /**
+         * Add an entry to the activity log
+         * @param {string} message - Log message
+         */
+        function logActivity(message) {
+            // Create timestamp
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            
+            // Create log entry
+            const logEntry = {
+                time: timeString,
+                message: message
+            };
+            
+            // Add to log
+            gameState.activityLog.unshift(logEntry);
+            
+            // Keep log size manageable
+            if (gameState.activityLog.length > 50) {
+                gameState.activityLog.pop();
+            }
+            
+            // Update log display
+            updateActivityLog();
+        }
+        
+        /**
+         * Update the activity log display
+         */
+        function updateActivityLog() {
+            const logContainer = document.getElementById('activity-log');
+            logContainer.innerHTML = '';
+            
+            // Add each log entry
+            gameState.activityLog.forEach(entry => {
+                const logElement = document.createElement('div');
+                logElement.classList.add('log-entry');
+                
+                logElement.innerHTML = `
+                    <span class="log-time">[${entry.time}]</span>
+                    <span class="log-message">${entry.message}</span>
+                `;
+                
+                logContainer.appendChild(logElement);
+            });
+        }
+
+        // ========== SAVE/LOAD SYSTEM ==========
+        /**
+         * Save game data to localStorage
+         */
+        function saveGameData() {
+            // Create save data object
+            const saveData = {
+                cityName: gameState.cityName,
+                points: gameState.points,
+                clickPower: gameState.clickPower,
+                cps: gameState.cps,
+                upgrades: gameState.upgrades,
+                banInfo: gameState.banInfo,
+                activityLog: gameState.activityLog,
+                lastSaved: Date.now()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('cityClickerSave', JSON.stringify(saveData));
+        }
+        
+        /**
+         * Load game data from localStorage
+         */
+        function loadGameData() {
+            // Get save data from localStorage
+            const saveData = localStorage.getItem('cityClickerSave');
+            
+            if (saveData) {
+                try {
+                    // Parse save data
+                    const parsedData = JSON.parse(saveData);
+                    
+                    // Update game state
+                    gameState.cityName = parsedData.cityName || '';
+                    gameState.points = parsedData.points || 0;
+                    gameState.clickPower = parsedData.clickPower || 1;
+                    gameState.cps = parsedData.cps || 0;
+                    gameState.upgrades = parsedData.upgrades || {};
+                    gameState.banInfo = parsedData.banInfo || {
+                        isBanned: false,
+                        isPermanent: false,
+                        reason: '',
+                        endTime: 0,
+                        strikes: 0,
+                        appealRejected: false
+                    };
+                    gameState.activityLog = parsedData.activityLog || [];
+                    
+                    // Initialize upgrades if needed
+                    if (Object.keys(gameState.upgrades).length === 0) {
+                        initializeUpgrades();
+                    }
+                    
+                    // Update UI
+                    updateUI();
+                    updateActivityLog();
+                    
+                    // Log activity
+                    logActivity('Game data loaded');
+                } catch (error) {
+                    console.error('Error loading save data:', error);
+                    logActivity('Error loading save data');
+                }
+            } else {
+                // Initialize new game
+                initializeUpgrades();
+            }
+        }
+        
+        /**
+         * Open the save/load modal
+         */
+        function openSaveModal() {
+            // Generate export code
+            const exportCode = btoa(JSON.stringify(gameState));
+            document.getElementById('export-code').value = exportCode;
+            
+            // Show modal
+            document.getElementById('save-modal').classList.add('active');
+        }
+        
+        /**
+         * Close the save/load modal
+         */
+        function closeSaveModal() {
+            document.getElementById('save-modal').classList.remove('active');
+        }
+        
+        /**
+         * Copy save code to clipboard
+         */
+        function copySaveCode() {
+            const exportCode = document.getElementById('export-code');
+            exportCode.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            alert('Save code copied to clipboard!');
+        }
+        
+        /**
+         * Import save from code
+         */
+        function importSave() {
+            const importCode = document.getElementById('import-code').value.trim();
+            
+            if (!importCode) {
+                alert('Please enter a save code');
+                return;
+            }
+            
+            try {
+                // Decode and parse save data
+                const importData = JSON.parse(atob(importCode));
+                
+                // Update game state
+                gameState.cityName = importData.cityName || '';
+                gameState.points = importData.points || 0;
+                gameState.clickPower = importData.clickPower || 1;
+                gameState.cps = importData.cps || 0;
+                gameState.upgrades = importData.upgrades || {};
+                gameState.banInfo = importData.banInfo || {
+                    isBanned: false,
+                    isPermanent: false,
+                    reason: '',
+                    endTime: 0,
+                    strikes: 0,
+                    appealRejected: false
+                };
+                gameState.activityLog = importData.activityLog || [];
+                
+                // Save game data
+                saveGameData();
+                
+                // Update UI
+                updateUI();
+                updateActivityLog();
+                
+                // Check ban status
+                checkBanStatus();
+                
+                // Close modal
+                closeSaveModal();
+                
+                // Log activity
+                logActivity('Game data imported');
+                
+                // Show feedback
+                alert('Save data imported successfully!');
+            } catch (error) {
+                console.error('Error importing save data:', error);
+                alert('Invalid save code');
+            }
+        }
+        
+        /**
+         * Confirm game reset
+         */
+        function confirmReset() {
+            if (confirm('Are you sure you want to reset your game? All progress will be lost!')) {
+                resetGame();
+            }
+        }
+        
+        /**
+         * Reset the game
+         */
+        function resetGame() {
+            // Clear localStorage
+            localStorage.removeItem('cityClickerSave');
+            
+            // Reset game state
+            gameState.cityName = '';
+            gameState.points = 0;
+            gameState.clickPower = 1;
+            gameState.cps = 0;
+            gameState.upgrades = {};
+            gameState.banInfo = {
+                isBanned: false,
+                isPermanent: false,
+                reason: '',
+                endTime: 0,
+                strikes: 0,
+                appealRejected: false
+            };
+            gameState.lastClickTimes = [];
+            gameState.activityLog = [];
+            
+            // Initialize upgrades
+            initializeUpgrades();
+            
+            // Show welcome screen
+            showScreen('welcome-screen');
+            
+            // Clear city name input
+            document.getElementById('city-name-input').value = '';
+            
+            // Log activity
+            logActivity('Game reset');
+        }
+    </script>
+</body>
+</html>
